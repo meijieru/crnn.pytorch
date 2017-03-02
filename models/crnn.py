@@ -2,6 +2,31 @@ import torch.nn as nn
 import torch.nn.parallel
 
 
+class BidirectionalLSTM(nn.Module):
+
+    def __init__(self, nIn, nHidden, nOut, ngpu):
+        super(BidirectionalLSTM, self).__init__()
+        self.ngpu = ngpu
+
+        self.rnn = nn.LSTM(nIn, nHidden, bidirectional=True)
+        self.embedding = nn.Linear(nHidden * 2, nOut)
+
+    def forward(self, input):
+        gpu_ids = None
+        if isinstance(input.data, torch.cuda.FloatTensor) and self.ngpu > 1:
+            gpu_ids = range(self.ngpu)
+        recurrent, _ = nn.parallel.data_parallel(
+            self.rnn, input, gpu_ids)  # [T, b, h * 2]
+
+        T, b, h = recurrent.size()
+        t_rec = recurrent.view(T * b, h)
+        output = nn.parallel.data_parallel(
+            self.embedding, t_rec, gpu_ids)  # [T * b, nOut]
+        output = output.view(T, b, -1)
+
+        return output
+
+
 class CRNN(nn.Module):
 
     def __init__(self, imgH, nc, nclass, nh, ngpu, n_rnn=2, leakyRelu=False):
@@ -30,45 +55,40 @@ class CRNN(nn.Module):
                 cnn.add_module('relu{0}'.format(i), nn.ReLU(True))
 
         convRelu(0)
-        cnn.add_module('pooling{0}'.format(0), nn.MaxPool2d((2, 2),
-                                                            (2, 2)))  # 64x16x64
+        cnn.add_module('pooling{0}'.format(0), nn.MaxPool2d(2, 2))  # 64x16x64
         convRelu(1)
-        cnn.add_module('pooling{0}'.format(1), nn.MaxPool2d((2, 2),
-                                                            (2, 2)))  # 128x8x32
+        cnn.add_module('pooling{0}'.format(1), nn.MaxPool2d(2, 2))  # 128x8x32
         convRelu(2, True)
         convRelu(3)
         cnn.add_module('pooling{0}'.format(2), nn.MaxPool2d((2, 2),
-                                                            (2, 2)))  # 256x4x16
+                                                            (2, 1),
+                                                            (0, 1)))  # 256x4x16
         convRelu(4, True)
         convRelu(5)
         cnn.add_module('pooling{0}'.format(3), nn.MaxPool2d((2, 2),
-                                                            (2, 1)))  # 512x2x16
+                                                            (2, 1),
+                                                            (0, 1)))  # 512x2x16
         convRelu(6, True)  # 512x1x16
 
         self.cnn = cnn
-        self.rnn = nn.Sequential(nn.LSTM(512, nh, n_rnn, bidirectional=True))
-        self.text = nn.Sequential(nn.Linear(nh * 2, nclass))  # [T, b, nclass]
+        self.rnn = nn.Sequential(
+            BidirectionalLSTM(512, nh, nh, ngpu),
+            BidirectionalLSTM(nh, nh, nclass, ngpu)
+        )
 
     def forward(self, input):
         gpu_ids = None
         if isinstance(input.data, torch.cuda.FloatTensor) and self.ngpu > 1:
             gpu_ids = range(self.ngpu)
+
         # conv features
         conv = nn.parallel.data_parallel(self.cnn, input, gpu_ids)
-
-        # rnn features
         b, c, h, w = conv.size()
         assert h == 1, "the height of conv must be 1"
         conv = conv.squeeze(2)
         conv = conv.permute(2, 0, 1)  # [w, b, c]
-        recurrent, _ = nn.parallel.data_parallel(self.rnn, conv,
-                                                 gpu_ids)  # [T, b, h * 2]
 
-        # text classifier
-        T, b, h = recurrent.size()
-        t_rec = recurrent.view(T * b, h)
-        text = nn.parallel.data_parallel(self.text, t_rec,
-                                         gpu_ids)  # [T * b, nclass]
-        text = text.view(T, b, -1)
+        # rnn features
+        output = nn.parallel.data_parallel(self.rnn, conv, gpu_ids)
 
-        return text
+        return output

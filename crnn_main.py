@@ -27,7 +27,7 @@ parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. de
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--ngpu', type=int, default=1, help='number of GPUs to use')
 parser.add_argument('--crnn', default='', help="path to crnn (to continue training)")
-parser.add_argument('--alphabet', type=str, default='abcdefghijklmnopqrstuvwxyz0123456789')
+parser.add_argument('--alphabet', type=str, default='0123456789abcdefghijklmnopqrstuvwxyz')
 parser.add_argument('--Diters', type=int, default=5, help='number of D iters per each G iter')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 parser.add_argument('--displayInterval', type=int, default=500, help='Interval to be displayed')
@@ -66,9 +66,9 @@ train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=opt.batchSize,
     shuffle=True, sampler=sampler,
     num_workers=int(opt.workers),
-    collate_fn=dataset.alignCollate(imgH=opt.imgH,
-     keep_ratio=opt.keep_ratio))
-test_dataset = dataset.lmdbDataset(root=opt.valroot, transform=dataset.resizeNormalize((128, 32)))
+    collate_fn=dataset.alignCollate(imgH=opt.imgH, keep_ratio=opt.keep_ratio))
+test_dataset = dataset.lmdbDataset(
+    root=opt.valroot, transform=dataset.resizeNormalize((128, 32)))
 
 ngpu = int(opt.ngpu)
 nh = int(opt.nh)
@@ -114,11 +114,12 @@ loss_avg = utils.averager()
 
 # setup optimizer
 if opt.adam:
-    optimizer = optim.Adam(crnn.parameters(), lr=opt.lrD, betas=(opt.beta1, 0.999))
+    optimizer = optim.Adam(crnn.parameters(), lr=opt.lr,
+                           betas=(opt.beta1, 0.999))
 elif opt.adadelta:
-    optimizer = optim.Adadelta(crnn.parameters(), lr=opt.lrD)
+    optimizer = optim.Adadelta(crnn.parameters(), lr=opt.lr)
 else:
-    optimizer = optim.RMSprop(crnn.parameters(), lr=opt.lrD)
+    optimizer = optim.RMSprop(crnn.parameters(), lr=opt.lr)
 
 
 def val(net, dataset, criterion, max_iter=100):
@@ -129,7 +130,7 @@ def val(net, dataset, criterion, max_iter=100):
 
     net.eval()
     data_loader = torch.utils.data.DataLoader(
- dataset, shuffle=True, batch_size=opt.batchSize, num_workers=int(opt.workers))
+        dataset, shuffle=True, batch_size=opt.batchSize, num_workers=int(opt.workers))
     val_iter = iter(data_loader)
 
     i = 0
@@ -167,6 +168,9 @@ def val(net, dataset, criterion, max_iter=100):
     print('Test loss: %f, accuray: %f' % (loss_avg.val(), accuracy))
 
 
+#  val(crnn, test_dataset, criterion)
+#  exit(0)
+
 def trainBatch(net, criterion, optimizer):
     data = train_iter.next()
     cpu_images, cpu_texts = data
@@ -198,7 +202,8 @@ for epoch in range(opt.niter):
         i += 1
 
         if i % opt.displayInterval == 0:
-            print('[%d/%d][%d/%d] Loss: %f' % (epoch, opt.niter, i, len(train_loader), loss_avg.val()))
+            print('[%d/%d][%d/%d] Loss: %f' %
+                  (epoch, opt.niter, i, len(train_loader), loss_avg.val()))
             loss_avg.reset()
 
         if i % opt.valInterval == 0:
@@ -206,4 +211,5 @@ for epoch in range(opt.niter):
 
         # do checkpointing
         if i % opt.saveInterval == 0:
-            torch.save(crnn.state_dict(), '{0}/netCRNN_{1}_{2}.pth'.format(opt.experiment, epoch, i))
+            torch.save(
+                crnn.state_dict(), '{0}/netCRNN_{1}_{2}.pth'.format(opt.experiment, epoch, i))

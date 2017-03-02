@@ -47,9 +47,8 @@ class strLabelConverter(object):
             index = 0
             for i in range(length.numel()):
                 l = length[i]
-                texts.append(
-                    self.decode(
-                        t[index:index + l], torch.IntTensor([l]), raw=raw))
+                texts.append(self.decode(
+                    t[index:index + l], torch.IntTensor([l]), raw=raw))
                 index += l
             return texts
 
@@ -95,6 +94,7 @@ def loadData(v, data):
 
 def prettyPrint(v):
     print('Size {0}, Type: {1}'.format(str(v.size()), v.data.type()))
+    print('| Max: %f | Min: %f | Mean: %f' % (v.max().data[0], v.min().data[0], v.mean().data[0]))
 
 
 def assureRatio(img):
