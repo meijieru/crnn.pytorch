@@ -1,5 +1,5 @@
 import torch.nn as nn
-import torch.nn.parallel
+import utils
 
 
 class BidirectionalLSTM(nn.Module):
@@ -12,16 +12,13 @@ class BidirectionalLSTM(nn.Module):
         self.embedding = nn.Linear(nHidden * 2, nOut)
 
     def forward(self, input):
-        gpu_ids = None
-        if isinstance(input.data, torch.cuda.FloatTensor) and self.ngpu > 1:
-            gpu_ids = range(self.ngpu)
-        recurrent, _ = nn.parallel.data_parallel(
-            self.rnn, input, gpu_ids)  # [T, b, h * 2]
+        recurrent, _ = utils.data_parallel(
+            self.rnn, input, self.ngpu)  # [T, b, h * 2]
 
         T, b, h = recurrent.size()
         t_rec = recurrent.view(T * b, h)
-        output = nn.parallel.data_parallel(
-            self.embedding, t_rec, gpu_ids)  # [T * b, nOut]
+        output = utils.data_parallel(
+            self.embedding, t_rec, self.ngpu)  # [T * b, nOut]
         output = output.view(T, b, -1)
 
         return output
@@ -77,18 +74,14 @@ class CRNN(nn.Module):
         )
 
     def forward(self, input):
-        gpu_ids = None
-        if isinstance(input.data, torch.cuda.FloatTensor) and self.ngpu > 1:
-            gpu_ids = range(self.ngpu)
-
         # conv features
-        conv = nn.parallel.data_parallel(self.cnn, input, gpu_ids)
+        conv = utils.data_parallel(self.cnn, input, self.ngpu)
         b, c, h, w = conv.size()
         assert h == 1, "the height of conv must be 1"
         conv = conv.squeeze(2)
         conv = conv.permute(2, 0, 1)  # [w, b, c]
 
         # rnn features
-        output = nn.parallel.data_parallel(self.rnn, conv, gpu_ids)
+        output = utils.data_parallel(self.rnn, conv, self.ngpu)
 
         return output
