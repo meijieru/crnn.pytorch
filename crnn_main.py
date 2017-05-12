@@ -68,7 +68,7 @@ train_loader = torch.utils.data.DataLoader(
     num_workers=int(opt.workers),
     collate_fn=dataset.alignCollate(imgH=opt.imgH, keep_ratio=opt.keep_ratio))
 test_dataset = dataset.lmdbDataset(
-    root=opt.valroot, transform=dataset.resizeNormalize((128, 32)))
+    root=opt.valroot, transform=dataset.resizeNormalize((100, 32)))
 
 ngpu = int(opt.ngpu)
 nh = int(opt.nh)
