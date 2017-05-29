@@ -137,7 +137,7 @@ def val(net, dataset, criterion, max_iter=100):
     n_correct = 0
     loss_avg = utils.averager()
 
-    for i in range(max_iter):
+    for i in range(min(max_iter, len(data_loader))):
         data = val_iter.next()
         i += 1
         cpu_images, cpu_texts = data
@@ -167,9 +167,6 @@ def val(net, dataset, criterion, max_iter=100):
     accuracy = n_correct / float(max_iter * opt.batchSize)
     print('Test loss: %f, accuray: %f' % (loss_avg.val(), accuracy))
 
-
-#  val(crnn, test_dataset, criterion)
-#  exit(0)
 
 def trainBatch(net, criterion, optimizer):
     data = train_iter.next()
