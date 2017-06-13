@@ -19,16 +19,15 @@ parser.add_argument('--trainroot', required=True, help='path to dataset')
 parser.add_argument('--valroot', required=True, help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
 parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
-parser.add_argument('--imgH', type=int, default=64, help='the height / width of the input image to network')
-parser.add_argument('--nh', type=int, default=100, help='size of the lstm hidden state')
+parser.add_argument('--imgH', type=int, default=32, help='the height / width of the input image to network')
+parser.add_argument('--nh', type=int, default=256, help='size of the lstm hidden state')
 parser.add_argument('--niter', type=int, default=25, help='number of epochs to train for')
-parser.add_argument('--lr', type=float, default=1, help='learning rate for Critic, default=0.00005')
+parser.add_argument('--lr', type=float, default=0.01, help='learning rate for Critic, default=0.00005')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--ngpu', type=int, default=1, help='number of GPUs to use')
 parser.add_argument('--crnn', default='', help="path to crnn (to continue training)")
 parser.add_argument('--alphabet', type=str, default='0123456789abcdefghijklmnopqrstuvwxyz')
-parser.add_argument('--Diters', type=int, default=5, help='number of D iters per each G iter')
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 parser.add_argument('--displayInterval', type=int, default=500, help='Interval to be displayed')
 parser.add_argument('--n_test_disp', type=int, default=10, help='Number of samples to display when test')
@@ -42,7 +41,7 @@ opt = parser.parse_args()
 print(opt)
 
 if opt.experiment is None:
-    opt.experiment = 'samples'
+    opt.experiment = 'expr'
 os.system('mkdir {0}'.format(opt.experiment))
 
 opt.manualSeed = random.randint(1, 10000)  # fix seed
@@ -160,7 +159,7 @@ def val(net, dataset, criterion, max_iter=100):
             if pred == target.lower():
                 n_correct += 1
 
-    raw_preds = converter.decode(preds.data, preds_size.data, raw=True)
+    raw_preds = converter.decode(preds.data, preds_size.data, raw=True)[:opt.n_test_disp]
     for raw_pred, pred, gt in zip(raw_preds, sim_preds, cpu_texts):
         print('%-20s => %-20s, gt: %-20s' % (raw_pred, pred, gt))
 
