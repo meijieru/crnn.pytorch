@@ -19,7 +19,8 @@ parser.add_argument('--trainroot', required=True, help='path to dataset')
 parser.add_argument('--valroot', required=True, help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
 parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
-parser.add_argument('--imgH', type=int, default=32, help='the height / width of the input image to network')
+parser.add_argument('--imgH', type=int, default=32, help='the height of the input image to network')
+parser.add_argument('--imgW', type=int, default=100, help='the width of the input image to network')
 parser.add_argument('--nh', type=int, default=256, help='size of the lstm hidden state')
 parser.add_argument('--niter', type=int, default=25, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=0.01, help='learning rate for Critic, default=0.00005')
@@ -65,7 +66,7 @@ train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=opt.batchSize,
     shuffle=True, sampler=sampler,
     num_workers=int(opt.workers),
-    collate_fn=dataset.alignCollate(imgH=opt.imgH, keep_ratio=opt.keep_ratio))
+    collate_fn=dataset.alignCollate(imgH=opt.imgH, imgW=opt.imgW, keep_ratio=opt.keep_ratio))
 test_dataset = dataset.lmdbDataset(
     root=opt.valroot, transform=dataset.resizeNormalize((100, 32)))
 

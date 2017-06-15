@@ -108,7 +108,7 @@ class randomSequentialSampler(sampler.Sampler):
 
 class alignCollate(object):
 
-    def __init__(self, imgH=32, imgW=128, keep_ratio=False, min_ratio=1):
+    def __init__(self, imgH=32, imgW=100, keep_ratio=False, min_ratio=1):
         self.imgH = imgH
         self.imgW = imgW
         self.keep_ratio = keep_ratio
