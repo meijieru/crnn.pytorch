@@ -137,7 +137,8 @@ def val(net, dataset, criterion, max_iter=100):
     n_correct = 0
     loss_avg = utils.averager()
 
-    for i in range(min(max_iter, len(data_loader))):
+    max_iter = min(max_iter, len(data_loader))
+    for i in range(max_iter):
         data = val_iter.next()
         i += 1
         cpu_images, cpu_texts = data
