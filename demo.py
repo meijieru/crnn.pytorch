@@ -11,7 +11,7 @@ model_path = './data/crnn.pth'
 img_path = './data/demo.png'
 alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
 
-model = crnn.CRNN(32, 1, 37, 256, 1).cuda()
+model = crnn.CRNN(32, 1, 37, 256).cuda()
 print('loading pretrained model from %s' % model_path)
 model.load_state_dict(torch.load(model_path))
 

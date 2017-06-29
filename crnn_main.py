@@ -70,13 +70,10 @@ train_loader = torch.utils.data.DataLoader(
 test_dataset = dataset.lmdbDataset(
     root=opt.valroot, transform=dataset.resizeNormalize((100, 32)))
 
-ngpu = int(opt.ngpu)
-nh = int(opt.nh)
-alphabet = opt.alphabet
-nclass = len(alphabet) + 1
+nclass = len(opt.alphabet) + 1
 nc = 1
 
-converter = utils.strLabelConverter(alphabet)
+converter = utils.strLabelConverter(opt.alphabet)
 criterion = CTCLoss()
 
 
@@ -89,7 +86,8 @@ def weights_init(m):
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
 
-crnn = crnn.CRNN(opt.imgH, nc, nclass, nh, ngpu)
+
+crnn = crnn.CRNN(opt.imgH, nc, nclass, opt.nh)
 crnn.apply(weights_init)
 if opt.crnn != '':
     print('loading pretrained model from %s' % opt.crnn)
@@ -102,6 +100,7 @@ length = torch.IntTensor(opt.batchSize)
 
 if opt.cuda:
     crnn.cuda()
+    crnn = torch.nn.DataParallel(crnn, device_ids=range(opt.ngpu))
     image = image.cuda()
     criterion = criterion.cuda()
 
