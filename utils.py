@@ -3,12 +3,25 @@
 
 import torch
 import torch.nn as nn
+from torch.autograd import Variable
 import collections
 
 
 class strLabelConverter(object):
+    """Convert between str and label.
 
-    def __init__(self, alphabet):
+    NOTE:
+        Insert `blank` to the alphabet for CTC.
+
+    Args:
+        alphabet (str): set of the possible characters.
+        ignore_case (bool, default=True): whether or not to ignore all of the case.
+    """
+
+    def __init__(self, alphabet, ignore_case=True):
+        self._ignore_case = ignore_case
+        if self._ignore_case:
+            alphabet = alphabet.lower()
         self.alphabet = alphabet + '-'  # for `-1` index
 
         self.dict = {}
@@ -16,24 +29,44 @@ class strLabelConverter(object):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
             self.dict[char] = i + 1
 
-    def encode(self, text, depth=0):
-        """Support batch or single str."""
+    def encode(self, text):
+        """Support batch or single str.
+
+        Args:
+            text (str or list of str): texts to convert.
+
+        Returns:
+            torch.IntTensor [length_0 + length_1 + ... length_{n - 1}]: encoded texts.
+            torch.IntTensor [n]: length of each text.
+        """
         if isinstance(text, str):
-            text = [self.dict[char.lower()] for char in text]
+            text = [
+                self.dict[char.lower() if self._ignore_case else char]
+                for char in text
+            ]
             length = [len(text)]
         elif isinstance(text, collections.Iterable):
             length = [len(s) for s in text]
             text = ''.join(text)
             text, _ = self.encode(text)
-
-        if depth:
-            return text, len(text)
         return (torch.IntTensor(text), torch.IntTensor(length))
 
     def decode(self, t, length, raw=False):
+        """Decode encoded texts back into strs.
+
+        Args:
+            torch.IntTensor [length_0 + length_1 + ... length_{n - 1}]: encoded texts.
+            torch.IntTensor [n]: length of each text.
+
+        Raises:
+            AssertionError: when the texts and its length does not match.
+
+        Returns:
+            text (str or list of str): texts to convert.
+        """
         if length.numel() == 1:
             length = length[0]
-            t = t[:length]
+            assert t.numel() == length, "text with length: {} does not match declared length: {}".format(t.numel(), length)
             if raw:
                 return ''.join([self.alphabet[i - 1] for i in t])
             else:
@@ -43,26 +76,35 @@ class strLabelConverter(object):
                         char_list.append(self.alphabet[t[i] - 1])
                 return ''.join(char_list)
         else:
+            # batch mode
+            assert t.numel() == length.sum(), "texts with length: {} does not match declared length: {}".format(t.numel(), length.sum())
             texts = []
             index = 0
             for i in range(length.numel()):
                 l = length[i]
-                texts.append(self.decode(
-                    t[index:index + l], torch.IntTensor([l]), raw=raw))
+                texts.append(
+                    self.decode(
+                        t[index:index + l], torch.IntTensor([l]), raw=raw))
                 index += l
             return texts
 
 
 class averager(object):
+    """Compute average for `torch.Variable` and `torch.Tensor`. """
 
     def __init__(self):
         self.reset()
 
     def add(self, v):
-        self.n_count += v.data.numel()
-        # NOTE: not `+= v.sum()`, which will add a node in the compute graph,
-        # which lead to memory leak
-        self.sum += v.data.sum()
+        if isinstance(v, Variable):
+            count = v.data.numel()
+            v = v.data.sum()
+        elif isinstance(v, torch.Tensor):
+            count = v.numel()
+            v = v.sum()
+
+        self.n_count += count
+        self.sum += v
 
     def reset(self):
         self.n_count = 0
@@ -94,7 +136,8 @@ def loadData(v, data):
 
 def prettyPrint(v):
     print('Size {0}, Type: {1}'.format(str(v.size()), v.data.type()))
-    print('| Max: %f | Min: %f | Mean: %f' % (v.max().data[0], v.min().data[0], v.mean().data[0]))
+    print('| Max: %f | Min: %f | Mean: %f' % (v.max().data[0], v.min().data[0],
+                                              v.mean().data[0]))
 
 
 def assureRatio(img):

@@ -51,9 +51,15 @@ class utilsTestCase(unittest.TestCase):
 
         # replicate mode
         result = encoder.decode(
-            torch.IntTensor([5, 5, 0, 1, 0]), torch.IntTensor([4]))
+            torch.IntTensor([5, 5, 0, 1]), torch.IntTensor([4]))
         target = 'ea'
         self.assertTrue(equal(result, target))
+
+        # raise AssertionError
+        def f():
+            result = encoder.decode(
+                torch.IntTensor([5, 5, 0, 1]), torch.IntTensor([3]))
+        self.assertRaises(AssertionError, f)
 
         # batch mode
         result = encoder.decode(
@@ -73,6 +79,11 @@ class utilsTestCase(unittest.TestCase):
         acc = utils.averager()
         acc.add(Variable(torch.Tensor([1, 2])))
         acc.add(Variable(torch.Tensor([[5, 6]])))
+        assert acc.val() == 3.5
+
+        acc = utils.averager()
+        acc.add(torch.Tensor([1, 2]))
+        acc.add(torch.Tensor([[5, 6]]))
         assert acc.val() == 3.5
 
     def checkAssureRatio(self):
