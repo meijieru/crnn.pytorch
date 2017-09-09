@@ -31,7 +31,6 @@ model.eval()
 preds = model(image)
 
 _, preds = preds.max(2)
-preds = preds.squeeze(2)
 preds = preds.transpose(1, 0).contiguous().view(-1)
 
 preds_size = Variable(torch.IntTensor([preds.size(0)]))
