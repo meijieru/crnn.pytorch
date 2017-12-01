@@ -11,9 +11,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--image", help="path of the image to test on")
 args = parser.parse_args()
 
-print args
-
-
 model_path = './data/crnn.pth'
 img_path = args.image or './data/demo.png'
 alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
