@@ -5,10 +5,17 @@ import dataset
 from PIL import Image
 
 import models.crnn as crnn
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--image", help="path of the image to test on")
+args = parser.parse_args()
+
+print args
 
 
 model_path = './data/crnn.pth'
-img_path = './data/demo.png'
+img_path = args.image or './data/demo.png'
 alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
 
 model = crnn.CRNN(32, 1, 37, 256)
