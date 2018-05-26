@@ -40,7 +40,6 @@ def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkV
     # print (len(imagePathList) , len(labelList))
     assert (len(imagePathList) == len(labelList))
     nSamples = len(imagePathList)
-    print('...................')
     env = lmdb.open(outputPath, map_size=1099511627776)
 
     cache = {}
@@ -93,7 +92,7 @@ def get_path_label(data_label_path):
 if __name__ == '__main__':
     args = argparse.ArgumentParser()
     args.add_argument('-f','--file',default='/data/datasets/segment-free/test.csv',help='the path of label file')
-    args.add_argument('-o','--output',default='/data/datasets/segment-free/lmdb',help='the path of output')
+    args.add_argument('-o','--output',default='/data/datasets/segment-free/test_lmdb',help='the path of output')
     arg = args.parse_args()
 
     imagePathList, labelList = get_path_label(arg.file)

@@ -3,6 +3,7 @@ import argparse
 import torch
 import torch.optim as optim
 import torch.utils.data
+from torch.autograd import Variable
 from warpctc_pytorch import CTCLoss
 import os
 import utils
@@ -10,7 +11,9 @@ import dataset
 from models import crnn
 from data_generator.config import Alphabet
 import pandas
+import time
 
+torch.backends.cudnn.benchmark= True
 def val(net, test_loader, criterion, converter, device):
     net.eval()
     n_correct = 0
@@ -19,14 +22,15 @@ def val(net, test_loader, criterion, converter, device):
     for i, (images, labels) in enumerate(test_loader):
         batch_size = images.size(0)
         text, length = converter.encode(labels)
-        text = torch.Tensor(text).int().to(device)
-        length = torch.Tensor(length).int().to(device)
+        text = torch.Tensor(text).int()
+        length = torch.Tensor(length).int()
         images, texts = images.to(device)
 
         preds = net(images)
+        preds.requires_grad_(False)
         preds_size = torch.Tensor([preds.size(0)] * batch_size).int()
-        loss = criterion(preds, text, preds_size, length) / batch_size
-        val_loss += loss
+        loss = criterion(preds, text, preds_size, length)
+        val_loss += loss.item()
 
         _, preds = preds.max(2)
         preds = preds.squeeze(2)
@@ -41,7 +45,7 @@ def val(net, test_loader, criterion, converter, device):
     print(pandas.DataFrame(data=pandas_show, columns=['network_output', 'ctc_output', 'ground_truth']))
 
     accuracy = n_correct / float(test_loader.dataset.__len__() * opt.batchSize)
-    print('Test loss: %f, accuray: %f' % (val_loss, accuracy))
+    print('Test loss: %f, accuray: %f' % (val_loss/test_loader.dataset.__len__(), accuracy))
 
 
 def train(opt):
@@ -83,33 +87,34 @@ def train(opt):
         net.load_state_dict(torch.load(opt.crnn))
 
     net = net.to(device)
-    criterion = criterion.cuda()
+    criterion = criterion.to(device)
 
     # setup optimizer
     optimizer = optim.Adam(net.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
 
     for epoch in range(opt.epochs):
-        train_loss = 0.0
         net.train()
+        start = time.time()
         for i, (images, labels) in enumerate(train_loader):
             batch_size = images.size(0)
             text, length = converter.encode(labels)
 
-            text = torch.Tensor(text).int().to(device)
-            length = torch.Tensor(length).int().to(device)
+            text = torch.Tensor(text).int()
+            length = torch.Tensor(length).int()
             image = images.to(device)
 
             preds = net(image)
             preds_size = torch.Tensor([preds.size(0)] * batch_size).int()
-            loss = criterion(preds, text, preds_size, length) / batch_size
-            net.zero_grad()
+            preds.requires_grad_(True)
+            loss = criterion(preds, text, preds_size, length)
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            train_loss += loss
-
-            if i % opt.displayInterval == 0:
-                print('[%d/%d][%d/%d] Loss: %f' % (epoch, opt.epochs, i, len(train_loader), train_loss))
+            if (i+1) % opt.displayInterval == 0:
+                batch_time = time.time()-start
+                start = time.time()
+                print('[%d/%d][%d/%d] Loss: %f Time:%f' % (epoch, opt.epochs, (i+1), len(train_loader), loss/batch_size,batch_time))
         val(net, test_loader, criterion, converter, device)
         torch.save(net.state_dict(), '{0}/netCRNN_{1}.pth'.format(opt.output_dir, epoch))
     torch.save(net, opt.output_dir + 'model.pkl')
@@ -117,10 +122,10 @@ def train(opt):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--trainroot', default='/data/datasets/segment-free/lmdb', help='path to dataset')
-    parser.add_argument('--valroot', default='/data/datasets/segment-free/lmdb', help='path to dataset')
-    parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
-    parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
+    parser.add_argument('--trainroot', default='/data/datasets/segment-free/train_lmdb', help='path to dataset')
+    parser.add_argument('--valroot', default='/data/datasets/segment-free/test_lmdb', help='path to dataset')
+    parser.add_argument('--workers', type=int, help='number of data loading workers', default=5)
+    parser.add_argument('--batchSize', type=int, default=128, help='input batch size')
     parser.add_argument('--imgH', type=int, default=32, help='the height of the input image to network')
     parser.add_argument('--imgW', type=int, default=100, help='the width of the input image to network')
     parser.add_argument('--nh', type=int, default=256, help='size of the lstm hidden state')
@@ -131,7 +136,7 @@ if __name__ == '__main__':
     parser.add_argument('--crnn', default='', help="path to crnn (to continue training)")
     parser.add_argument('--alphabet', type=str, default=Alphabet.CHINESECHAR_LETTERS_DIGITS_EXTENDED)
     parser.add_argument('--output_dir', default=None, help='Where to store samples and models')
-    parser.add_argument('--displayInterval', type=int, default=20, help='Interval to be displayed')
+    parser.add_argument('--displayInterval', type=int, default=100, help='Interval to be displayed')
     parser.add_argument('--n_test_disp', type=int, default=10, help='Number of samples to display when test')
     parser.add_argument('--valInterval', type=int, default=500, help='Interval to be displayed')
     parser.add_argument('--random_sample', action='store_true',
