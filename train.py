@@ -3,7 +3,6 @@ import argparse
 import torch
 import torch.optim as optim
 import torch.utils.data
-from torch.autograd import Variable
 from warpctc_pytorch import CTCLoss
 import os
 import utils
