@@ -16,7 +16,6 @@ class BidirectionalLSTM(nn.Module):
 
         output = self.embedding(t_rec)  # [T * b, nOut]
         output = output.view(T, b, -1)
-
         return output
 
 
