@@ -2,21 +2,19 @@ import torch
 import utils
 import dataset
 from PIL import Image
-
+from data_generator.config import Alphabet
 import models.crnn as crnn
 
-
-model_path = './data/crnn.pth'
-img_path = './data/demo.png'
-alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
-
+model_path = './expr/netCRNN_0.pth'
+img_path = '/data/datasets/segment-free/test/0_song5_0_3_b_w.jpg'
+alphabet = Alphabet.CHINESECHAR_LETTERS_DIGITS_EXTENDED
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-model = crnn.CRNN(32, 1, 37, 256).to(device)
+model = crnn.CRNN(32, 1, len(alphabet), 256).to(device)
 print('loading pretrained model from %s' % model_path)
 model.load_state_dict(torch.load(model_path))
 
 converter = utils.strLabelConverter(alphabet)
-transformer = dataset.resizeNormalize((100, 32))
+transformer = dataset.resizeNormalize((200, 32))
 image = Image.open(img_path).convert('L')
 image = transformer(image)
 if torch.cuda.is_available():

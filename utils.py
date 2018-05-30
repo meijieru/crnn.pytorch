@@ -131,3 +131,8 @@ def assureRatio(img):
         main = nn.UpsamplingBilinear2d(size=(h, h), scale_factor=None)
         img = main(img)
     return img
+
+if __name__ == '__main__':
+    from data_generator.config import Alphabet
+    converter = strLabelConverter(Alphabet.CHINESECHAR_LETTERS_DIGITS_EXTENDED)
+    converter.encode()

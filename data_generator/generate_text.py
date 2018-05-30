@@ -158,7 +158,7 @@ if __name__ == '__main__':
     # 读取词典文本
     # with open(opt.charset, encoding='utf8') as to_read:
     # text = ''.join(map(str.strip, to_read.readlines()))
-    text = Alphabet.CHINESECHAR_LETTERS_DIGITS_EXTENDED
+    text = Alphabet.CHINESECHAR_LETTERS_DIGIT # 生成数据使用的字符不应该带有空白字符
     text_len = len(text)
     print('using characters', text_len, 'using fonts', len(fonts))
     # 开始生成数据

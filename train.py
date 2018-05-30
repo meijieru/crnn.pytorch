@@ -58,14 +58,14 @@ def train(opt):
         opt.output_dir = 'output'
     if not os.path.exists(opt.output_dir):
         os.mkdir(opt.output_dir)
-    nclass = len(opt.alphabet) + 1
     nc = 1
     device = torch.device("cuda:0" if gpu_id is not None and torch.cuda.is_available() else "cpu")
+    # ************************* image dataset
     # train_dataset = dataset.ImageDataset(txt=opt.trainfile, data_shape=(opt.imgH, opt.imgW), channel=nc,
     #                       transform=transforms.ToTensor())
     # test_dataset = dataset.ImageDataset(txt=opt.valfile, data_shape=(opt.imgH, opt.imgW), channel=nc,
     #                                  transform=transforms.ToTensor())
-    #
+
     train_transform = transforms.Compose([transforms.Resize((opt.imgH, opt.imgW)), transforms.ToTensor()])
     train_dataset = dataset.lmdbDataset(root=opt.trainroot, transform=train_transform)
     test_dataset = dataset.lmdbDataset(root=opt.valroot, transform=train_transform)
@@ -74,6 +74,8 @@ def train(opt):
                                                num_workers=int(opt.workers))
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batchSize, shuffle=True,
                                               num_workers=int(opt.workers))
+
+    # ************************* origin dataset and dataloader
     # train_dataset = dataset.lmdbDataset(root=opt.trainroot)
     # train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=opt.batchSize, shuffle=True,
     #                                            num_workers=int(opt.workers),
@@ -94,7 +96,7 @@ def train(opt):
             m.weight.data.normal_(1.0, 0.02)
             m.bias.data.fill_(0)
 
-    net = crnn.CRNN(opt.imgH, nc, nclass, opt.nh).to(device)
+    net = crnn.CRNN(opt.imgH, nc, len(opt.alphabet), opt.nh).to(device)
     net.apply(weights_init)
     if opt.crnn != '':
         print('loading pretrained model from %s' % opt.crnn)
@@ -112,6 +114,7 @@ def train(opt):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 10, gamma=0.1)
     for epoch in range(opt.epochs):
         net.train()
+        # Adjust lr
         scheduler.step()
         start = time.time()
         cur_step = 0
@@ -122,12 +125,13 @@ def train(opt):
 
             text = torch.Tensor(text).int()
             length = torch.Tensor(length).int()
-            image = images.to(device)
+            images = images.to(device)
 
-            preds = net(image)
+            preds = net(images)
             preds_size = torch.Tensor([preds.size(0)] * batch_size).int()
             preds.requires_grad_(True)
             loss = criterion(preds, text, preds_size, length) # text,preds_size must be cpu
+            # backward
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -139,22 +143,26 @@ def train(opt):
             for pred, target in zip(sim_preds, labels):
                 if pred == target:
                     n_correct += 1
-
+            # write tensorboard
             cur_step = epoch * (train_dataset.__len__() / batch_size) + i
             writer.add_scalar(tag='Train/loss', scalar_value=loss.item(), global_step=cur_step)
             writer.add_scalar(tag='Train/acc', scalar_value=n_correct / batch_size, global_step=cur_step)
             writer.add_scalar(tag='Train/lr', scalar_value=scheduler.get_lr()[0], global_step=cur_step)
-
+            # display msg
             if (i + 1) % opt.displayInterval == 0:
                 batch_time = time.time() - start
                 start = time.time()
                 print('[%d/%d][%d/%d] Loss:%f Acc:%.f Time:%fs Lr:%f' % (
                 epoch, opt.epochs, (i + 1), len(train_loader), loss / batch_size, n_correct / batch_size, batch_time,
                 scheduler.get_lr()[0]))
+        # test
         val_acc,val_loss = val(net, test_loader, criterion, converter, device)
+        # write tensorboard
         writer.add_scalar(tag='Eval/acc', scalar_value=val_acc, global_step=cur_step)
         writer.add_scalar(tag='Eval/loss', scalar_value=val_loss, global_step=cur_step)
+        # save params
         torch.save(net.state_dict(), '{0}/netCRNN_{1}.pth'.format(opt.output_dir, epoch))
+    # save final model
     torch.save(net, opt.output_dir + '/model.pkl')
     writer.close()
 
