@@ -15,9 +15,9 @@ import time
 from tensorboardX import SummaryWriter
 
 torch.backends.cudnn.benchmark = True
-gpu_id = "0"
+gpu_id = "1"
 os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
-print('train with gpu:', gpu_id)
+print('train with gpu %s and pytorch %s' % (gpu_id, torch.__version__))
 
 
 def val(net, test_loader, criterion, converter, device):
@@ -51,7 +51,8 @@ def val(net, test_loader, criterion, converter, device):
 
     accuracy = n_correct / float(test_loader.dataset.__len__())
     print('Test loss: %f, accuray: %f' % (val_loss / test_loader.dataset.__len__(), accuracy))
-    return accuracy,val_loss / test_loader.dataset.__len__()
+    return accuracy, val_loss / test_loader.dataset.__len__()
+
 
 def train(opt):
     if opt.output_dir is None:
@@ -95,7 +96,6 @@ def train(opt):
         elif classname.find('BatchNorm') != -1:
             m.weight.data.normal_(1.0, 0.02)
             m.bias.data.fill_(0)
-
     net = crnn.CRNN(opt.imgH, nc, len(opt.alphabet), opt.nh).to(device)
     net.apply(weights_init)
     if opt.crnn != '':
@@ -130,12 +130,12 @@ def train(opt):
             preds = net(images)
             preds_size = torch.Tensor([preds.size(0)] * batch_size).int()
             preds.requires_grad_(True)
-            loss = criterion(preds, text, preds_size, length) # text,preds_size must be cpu
+            loss = criterion(preds, text, preds_size, length)  # text,preds_size must be cpu
             # backward
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            
+
             _, preds = preds.max(2)
             preds = preds.squeeze(1)
             preds = preds.transpose(1, 0).contiguous().view(-1)
@@ -152,11 +152,12 @@ def train(opt):
             if (i + 1) % opt.displayInterval == 0:
                 batch_time = time.time() - start
                 start = time.time()
-                print('[%d/%d][%d/%d] Loss:%f Acc:%.f Time:%fs Lr:%f' % (
-                epoch, opt.epochs, (i + 1), len(train_loader), loss / batch_size, n_correct / batch_size, batch_time,
-                scheduler.get_lr()[0]))
+                print('[%d/%d][%d/%d] Loss:%f Acc:%f Time:%fs Lr:%f' % (
+                    epoch, opt.epochs, (i + 1), len(train_loader), loss / batch_size, n_correct / batch_size,
+                    batch_time,
+                    scheduler.get_lr()[0]))
         # test
-        val_acc,val_loss = val(net, test_loader, criterion, converter, device)
+        val_acc, val_loss = val(net, test_loader, criterion, converter, device)
         # write tensorboard
         writer.add_scalar(tag='Eval/acc', scalar_value=val_acc, global_step=cur_step)
         writer.add_scalar(tag='Eval/loss', scalar_value=val_loss, global_step=cur_step)
@@ -169,8 +170,8 @@ def train(opt):
 
 def init_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--trainroot', default='/data/datasets/segment-free/train_lmdb', help='path to dataset')
-    parser.add_argument('--valroot', default='/data/datasets/segment-free/test_lmdb', help='path to dataset')
+    parser.add_argument('--trainroot', default='/data1/zj/dataset/train_lmdb', help='path to dataset')
+    parser.add_argument('--valroot', default='/data1/zj/dataset/test_lmdb', help='path to dataset')
     parser.add_argument('--trainfile', default='/data/datasets/segment-free/train.csv', help='path to dataset file')
     parser.add_argument('--valfile', default='/data/datasets/segment-free/test.csv', help='path to dataset file')
     parser.add_argument('--workers', type=int, help='number of data loading workers', default=18)
@@ -182,8 +183,8 @@ def init_args():
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate for Critic, default=0.00005')
     parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
     parser.add_argument('--crnn', default='', help="path to crnn (to continue training)")
-    parser.add_argument('--alphabet', type=str, default=Alphabet.CHINESECHAR_LETTERS_DIGITS_EXTENDED)
-    parser.add_argument('--output_dir', default='expr', help='Where to store samples and models')
+    parser.add_argument('--alphabet', type=str, default=Alphabet.CHINESECHAR_LETTERS_DIGIT_SYMBOLS)
+    parser.add_argument('--output_dir', default='output1', help='Where to store samples and models')
     parser.add_argument('--displayInterval', type=int, default=100, help='Interval to be displayed')
     parser.add_argument('--n_test_disp', type=int, default=10, help='Number of samples to display when test')
     parser.add_argument('--valInterval', type=int, default=500, help='Interval to be displayed')

@@ -5,7 +5,7 @@ from PIL import Image
 from data_generator.config import Alphabet
 import models.crnn as crnn
 
-model_path = './expr/netCRNN_0.pth'
+model_path = './output/netCRNN_0.pth'
 img_path = '/data/datasets/segment-free/test/0_song5_0_3_b_w.jpg'
 alphabet = Alphabet.CHINESECHAR_LETTERS_DIGITS_EXTENDED
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

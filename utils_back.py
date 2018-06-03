@@ -8,13 +8,13 @@ import collections
 from data_generator.config import Alphabet
 
 class strLabelConverter(object):
-    def __init__(self, alphabet):
-        self.alphabet = alphabet
+    def __init__(self, alphabet,blank_alphabet):
+        self.alphabet = alphabet + blank_alphabet
 
         self.dict = {}
-        for i, char in enumerate(self.alphabet):
+        for i, char in enumerate(alphabet):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
-            self.dict[char] = i
+            self.dict[char] = i + 1
 
     def encode(self, text):
         """Support batch or single str.
@@ -53,12 +53,12 @@ class strLabelConverter(object):
             assert t.numel() == length, "text with length: {} does not match declared length: {}".format(t.numel(),
                                                                                                          length)
             if raw:
-                return ''.join([self.alphabet[i] for i in t])
+                return ''.join([self.alphabet[i - 1] for i in t])
             else:
                 char_list = []
                 for i in range(length):
                     if t[i] != 0 and (not (i > 0 and t[i - 1] == t[i])):
-                        char_list.append(self.alphabet[t[i]])
+                        char_list.append(self.alphabet[t[i] - 1])
                 return ''.join(char_list)
         else:
             # batch mode
