@@ -24,6 +24,7 @@ Expected output:
 
 Dependence
 ----------
+* pytorch0.4
 * [warp_ctc_pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorch_bindings/pytorch_binding)
 * lmdb
 
