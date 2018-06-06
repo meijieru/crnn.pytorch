@@ -91,8 +91,8 @@ def get_path_label(data_label_path):
 
 if __name__ == '__main__':
     args = argparse.ArgumentParser()
-    args.add_argument('-f','--file',default='/data1/zj/dataset/train.csv',help='the path of label file')
-    args.add_argument('-o','--output',default='/data1/zj/dataset/train_lmdb',help='the path of output')
+    args.add_argument('-f','--file',default='/data/zj/dataset/test.csv',help='the path of label file')
+    args.add_argument('-o','--output',default='/data/zj/dataset/test_lmdb',help='the path of output')
     arg = args.parse_args()
 
     imagePathList, labelList = get_path_label(arg.file)

@@ -18,6 +18,22 @@ class BidirectionalLSTM(nn.Module):
         output = output.view(T, b, -1)
         return output
 
+class BidirectionalGRU(nn.Module):
+
+    def __init__(self, nIn, nHidden, nOut):
+        super(BidirectionalGRU, self).__init__()
+
+        self.rnn = nn.GRU(nIn, nHidden, bidirectional=True)
+        self.embedding = nn.Linear(nHidden * 2, nOut)
+
+    def forward(self, input):
+        recurrent, _ = self.rnn(input)
+        T, b, h = recurrent.size()
+        t_rec = recurrent.view(T * b, h)
+
+        output = self.embedding(t_rec)  # [T * b, nOut]
+        output = output.view(T, b, -1)
+        return output
 
 class CRNN(nn.Module):
 
@@ -61,8 +77,8 @@ class CRNN(nn.Module):
 
         self.cnn = cnn
         self.rnn = nn.Sequential(
-            BidirectionalLSTM(512, nh, nh),
-            BidirectionalLSTM(nh, nh, nclass))
+            BidirectionalGRU(512, nh, nh),
+            BidirectionalGRU(nh, nh, nclass))
 
     def forward(self, input):
         # conv features

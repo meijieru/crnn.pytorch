@@ -15,7 +15,7 @@ import time
 from tensorboardX import SummaryWriter
 
 torch.backends.cudnn.benchmark = True
-gpu_id = "1"
+gpu_id = "2"
 os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
 print('train with gpu %s and pytorch %s' % (gpu_id, torch.__version__))
 
@@ -97,13 +97,14 @@ def train(opt):
             m.weight.data.normal_(1.0, 0.02)
             m.bias.data.fill_(0)
     net = crnn.CRNN(opt.imgH, nc, len(opt.alphabet), opt.nh).to(device)
-    net.apply(weights_init)
+    # net.apply(weights_init)
     if opt.crnn != '':
         print('loading pretrained model from %s' % opt.crnn)
         net.load_state_dict(torch.load(opt.crnn))
 
     net = net.to(device)
-    writer = SummaryWriter('./log/%s' % (time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())))
+    # writer = SummaryWriter('./log/%s' % (time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())))
+    writer = SummaryWriter('./log/GRU_default')
     # dummy_input = torch.autograd.Variable(torch.Tensor(1, nc, opt.imgH, opt.imgW).to(device))
     # writer.add_graph(model=net, input_to_model=dummy_input)
 
@@ -111,7 +112,7 @@ def train(opt):
 
     # setup optimizer
     optimizer = optim.Adam(net.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 10, gamma=0.1)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 3, gamma=0.1)
     for epoch in range(opt.epochs):
         net.train()
         # Adjust lr
@@ -145,7 +146,7 @@ def train(opt):
                     n_correct += 1
             # write tensorboard
             cur_step = epoch * (train_dataset.__len__() / batch_size) + i
-            writer.add_scalar(tag='Train/loss', scalar_value=loss.item(), global_step=cur_step)
+            writer.add_scalar(tag='Train/loss', scalar_value=loss.item() / batch_size, global_step=cur_step)
             writer.add_scalar(tag='Train/acc', scalar_value=n_correct / batch_size, global_step=cur_step)
             writer.add_scalar(tag='Train/lr', scalar_value=scheduler.get_lr()[0], global_step=cur_step)
             # display msg
@@ -170,11 +171,11 @@ def train(opt):
 
 def init_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--trainroot', default='/data1/zj/dataset/train_lmdb', help='path to dataset')
-    parser.add_argument('--valroot', default='/data1/zj/dataset/test_lmdb', help='path to dataset')
+    parser.add_argument('--trainroot', default='/data/zj/dataset/train_lmdb', help='path to dataset')
+    parser.add_argument('--valroot', default='/data/zj/dataset/test_lmdb', help='path to dataset')
     parser.add_argument('--trainfile', default='/data/datasets/segment-free/train.csv', help='path to dataset file')
     parser.add_argument('--valfile', default='/data/datasets/segment-free/test.csv', help='path to dataset file')
-    parser.add_argument('--workers', type=int, help='number of data loading workers', default=18)
+    parser.add_argument('--workers', type=int, help='number of data loading workers', default=3)
     parser.add_argument('--batchSize', type=int, default=128, help='input batch size')
     parser.add_argument('--imgH', type=int, default=32, help='the height of the input image to network')
     parser.add_argument('--imgW', type=int, default=200, help='the width of the input image to network')
@@ -184,7 +185,7 @@ def init_args():
     parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
     parser.add_argument('--crnn', default='', help="path to crnn (to continue training)")
     parser.add_argument('--alphabet', type=str, default=Alphabet.CHINESECHAR_LETTERS_DIGIT_SYMBOLS)
-    parser.add_argument('--output_dir', default='output1', help='Where to store samples and models')
+    parser.add_argument('--output_dir', default='output_gru_default', help='Where to store samples and models')
     parser.add_argument('--displayInterval', type=int, default=100, help='Interval to be displayed')
     parser.add_argument('--n_test_disp', type=int, default=10, help='Number of samples to display when test')
     parser.add_argument('--valInterval', type=int, default=500, help='Interval to be displayed')
