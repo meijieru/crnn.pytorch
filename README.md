@@ -27,6 +27,17 @@ Dependence
 * [warp_ctc_pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorch_bindings/pytorch_binding)
 * lmdb
 
+error when install warp_ctc_pytorch
+----------
+* [ 11%] Building NVCC (Device) object CMakeFiles/warpctc.dir/src/warpctc_generated_reduce.cu.o
+ sh: cicc: command not found
+  CMake Error at warpctc_generated_reduce.cu.o.cmake:279 (message):
+  Error generating file
+  /home/rice/warp-ctc/build/CMakeFiles/warpctc.dir/src/./warpctc_generated_reduce.cu.o
+ make[2]: *** [CMakeFiles/warpctc.dir/build.make:256: CMakeFiles/warpctc.dir/src/warpctc_generated_reduce.cu.o] Error 1
+ make[1]: *** [CMakeFiles/Makefile2:104: CMakeFiles/warpctc.dir/all] Error 2
+ make: *** [Makefile:130: all] Error 2               you should reinstall your cuda, and make sure it install completely
+* THCudaMallco error      https://github.com/baidu-research/warp-ctc/pull/71/files
 Train a new model
 -----------------
 1. Construct dataset following origin guide. For training with variable length, please sort the image according to the text length.
