@@ -38,6 +38,7 @@ error when install warp_ctc_pytorch
  make[1]: *** [CMakeFiles/Makefile2:104: CMakeFiles/warpctc.dir/all] Error 2
  make: *** [Makefile:130: all] Error 2               you should reinstall your cuda, and make sure it install completely
 * THCudaMallco error      https://github.com/baidu-research/warp-ctc/pull/71/files
+
 Train a new model
 -----------------
 1. Construct dataset following origin guide. For training with variable length, please sort the image according to the text length.
