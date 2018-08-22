@@ -38,6 +38,14 @@ error when install warp_ctc_pytorch
  make[1]: *** [CMakeFiles/Makefile2:104: CMakeFiles/warpctc.dir/all] Error 2
  make: *** [Makefile:130: all] Error 2               you should reinstall your cuda, and make sure it install completely
 * THCudaMallco error      https://github.com/baidu-research/warp-ctc/pull/71/files
+* cc1: warning: command line option ‘-std=c++11’ is valid for C++/ObjC++ but not for C
+In file included from /home/rice/anaconda3/envs/myenv2.7/lib/python2.7/site-packages/torch/utils/ffi/../../lib/include/THC/THC.h:4:0,
+                 from build/warpctc_pytorch/_warp_ctc/__warp_ctc.c:493:
+/home/rice/anaconda3/envs/myenv2.7/lib/python2.7/site-packages/torch/utils/ffi/../../lib/include/THC/THCGeneral.h:12:10: fatal error: cuda.h: No such file or directory
+ #include "cuda.h"
+          ^~~~~~~~
+compilation terminated.
+error: command 'gcc' failed with exit status 1
 
 Train a new model
 -----------------
