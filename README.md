@@ -44,7 +44,7 @@ error when install warp_ctc_pytorch
  make[1]: *** [CMakeFiles/Makefile2:104: CMakeFiles/warpctc.dir/all] Error 2
  make: *** [Makefile:130: all] Error 2               you should reinstall your cuda, and make sure it install completely
 * THCudaMallco error      https://github.com/baidu-research/warp-ctc/pull/71/files
-
+*https://github.com/Xtra-Computing/thundersvm/issues/54#issuecomment-416413155
 
 Train a new model
 -----------------
