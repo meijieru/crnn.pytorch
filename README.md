@@ -4,6 +4,12 @@ Convolutional Recurrent Neural Network
 This software implements the Convolutional Recurrent Neural Network (CRNN) in pytorch.
 Origin software could be found in [crnn](https://github.com/bgshih/crnn)
 
+Envrionment 
+--------
+python 3.6
+pytorch 4.0
+
+
 Run demo
 --------
 A demo program can be found in ``src/demo.py``. Before running the demo, download a pretrained model
@@ -38,16 +44,9 @@ error when install warp_ctc_pytorch
  make[1]: *** [CMakeFiles/Makefile2:104: CMakeFiles/warpctc.dir/all] Error 2
  make: *** [Makefile:130: all] Error 2               you should reinstall your cuda, and make sure it install completely
 * THCudaMallco error      https://github.com/baidu-research/warp-ctc/pull/71/files
-* cc1: warning: command line option ‘-std=c++11’ is valid for C++/ObjC++ but not for C
-In file included from /home/rice/anaconda3/envs/myenv2.7/lib/python2.7/site-packages/torch/utils/ffi/../../lib/include/THC/THC.h:4:0,
-                 from build/warpctc_pytorch/_warp_ctc/__warp_ctc.c:493:
-/home/rice/anaconda3/envs/myenv2.7/lib/python2.7/site-packages/torch/utils/ffi/../../lib/include/THC/THCGeneral.h:12:10: fatal error: cuda.h: No such file or directory
- #include "cuda.h"
-          ^~~~~~~~
-compilation terminated.
-error: command 'gcc' failed with exit status 1
+
 
 Train a new model
 -----------------
-1. Construct dataset following origin guide. For training with variable length, please sort the image according to the text length.
+1. Construct dataset following origin guide. For training with variable length, please sort the image according to the text length. reference:https://github.com/Aurora11111/TextRecognitionDataGenerator
 2. ``python crnn_main.py [--param val]``. Explore ``crnn_main.py`` for details.
