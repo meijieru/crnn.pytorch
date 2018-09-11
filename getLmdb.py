@@ -59,7 +59,7 @@ def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkV
         labelKey = 'label-%09d' % cnt
         cache[imageKey] = imageBin
         cache[labelKey] = label
-        ##########
+
         if lexiconList:
             lexiconKey = 'lexicon-%09d' % cnt
             cache[lexiconKey] = ' '.join(lexiconList[i])
