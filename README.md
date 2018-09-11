@@ -9,6 +9,8 @@ Envrionment
 python 3.6
 pytorch 4.0
 
+ATTENTION!
+getLmdb.py must run in python2.x
 
 Run demo
 --------
