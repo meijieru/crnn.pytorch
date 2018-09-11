@@ -5,14 +5,17 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import collections
+import chardet
+import numpy as np
+import sys
+
+
 
 
 class strLabelConverter(object):
     """Convert between str and label.
-
     NOTE:
         Insert `blank` to the alphabet for CTC.
-
     Args:
         alphabet (str): set of the possible characters.
         ignore_case (bool, default=True): whether or not to ignore all of the case.
@@ -21,7 +24,7 @@ class strLabelConverter(object):
     def __init__(self, alphabet, ignore_case=True):
         self._ignore_case = ignore_case
         if self._ignore_case:
-            alphabet = alphabet.lower()
+            alphabet = alphabet
         self.alphabet = alphabet + '-'  # for `-1` index
 
         self.dict = {}
@@ -29,44 +32,54 @@ class strLabelConverter(object):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
             self.dict[char] = i + 1
 
+    def is_chinese(self, uchar):
+        """判断一个unicode是否是汉字"""
+        alnum = np.array([ch.isalnum() for ch in uchar])
+        if not alnum.all():
+            return True
+        else:
+            return False
+
     def encode(self, text):
         """Support batch or single str.
-
         Args:
             text (str or list of str): texts to convert.
-
         Returns:
             torch.IntTensor [length_0 + length_1 + ... length_{n - 1}]: encoded texts.
             torch.IntTensor [n]: length of each text.
         """
-        if isinstance(text, str):
-            text = [
-                self.dict[char.lower() if self._ignore_case else char]
-                for char in text
-            ]
-            length = [len(text)]
-        elif isinstance(text, collections.Iterable):
-            length = [len(s) for s in text]
-            text = ''.join(text)
-            text, _ = self.encode(text)
+        length = []
+        result = []
+        #print(text)
+        for item in text:
+            #print(item)
+
+            if self.is_chinese(item):
+                 #item = unicode(item, 'utf-8')
+                 item = str(item.encode('utf-8'))
+                #item = item
+            length.append(len(item))
+            for char in item:
+                #print(char)
+                index = self.dict[char]
+                result.append(index)
+        text = result
         return (torch.IntTensor(text), torch.IntTensor(length))
 
     def decode(self, t, length, raw=False):
         """Decode encoded texts back into strs.
-
         Args:
             torch.IntTensor [length_0 + length_1 + ... length_{n - 1}]: encoded texts.
             torch.IntTensor [n]: length of each text.
-
         Raises:
             AssertionError: when the texts and its length does not match.
-
         Returns:
             text (str or list of str): texts to convert.
         """
         if length.numel() == 1:
             length = length[0]
-            assert t.numel() == length, "text with length: {} does not match declared length: {}".format(t.numel(), length)
+            assert t.numel() == length, "text with length: {} does not match declared length: {}".format(t.numel(),
+                                                                                                         length)
             if raw:
                 return ''.join([self.alphabet[i - 1] for i in t])
             else:
@@ -77,7 +90,8 @@ class strLabelConverter(object):
                 return ''.join(char_list)
         else:
             # batch mode
-            assert t.numel() == length.sum(), "texts with length: {} does not match declared length: {}".format(t.numel(), length.sum())
+            assert t.numel() == length.sum(), "texts with length: {} does not match declared length: {}".format(
+                t.numel(), length.sum())
             texts = []
             index = 0
             for i in range(length.numel()):
