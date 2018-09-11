@@ -88,23 +88,11 @@ if __name__ == '__main__':
     imgdata = open("/run/media/rice/DATA/labellist1.txt")
     imagePathList = []
     imgLabelLists = []
-    i = 0
-    # # for filename in glob.glob(os.path.join('/run/media/rice/DATA/number/data/', '*.jpg')):
-    # #     print filename
-    # #     imagePathList.append(filename)
-
-    # print len(imagePathList)
     for line in list(imgdata):
-        print line
-        if i< 1251067:
-            label = line.split()[1]
-            image = line.split()[0]
-            imgLabelLists.append(label)
-            imagePathList.append('/run/media/rice/DATA/datasets2/' + image+".jpg")
-        else:
-            break
-        i += 1
-    #imgLabelLists = sorted(imgLabelLists, key=lambda x: len(x[0]))
+        label = line.split()[1]
+        image = line.split()[0]
+        imgLabelLists.append(label)
+        imagePathList.append('/run/media/rice/DATA/datasets2/' + image+".jpg")
 
     print len(imagePathList)
     print  len(imgLabelLists)
