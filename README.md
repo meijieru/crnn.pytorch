@@ -37,10 +37,11 @@ Construct dataset following origin guide. For training with variable length, ple
 1. 数据预处理
 
 运行`/contrib/crnn/tool/getLmdb.py`
+
     # 生成的lmdb输出路径
-    outputPath = "./train_lmdb"
+    outputPath = '/run/media/rice/DATA/chinese1/lmdb'
     # 图片及对应的label
-    imgdata = open("./train.txt")
+     imgdata = open("/run/media/rice/DATA/chinese1/labels.txt")
 
 2. 训练模型
 
