@@ -14,10 +14,7 @@ pytorch 4.0
 opencv2.4 + pytorch + lmdb +wrap_ctc
 
 安装lmdb `apt-get install lmdb`
-#### 安装pytorch
-pip,linux,cuda8.0,python2.7:pip install http://download.pytorch.org/whl/cu80/torch-0.1.12.post2-cp27-none-linux_x86_64.whl
-参考：http://pytorch.org/
-#### 安装wrap_ctc
+安装wrap_ctc
     git clone https://github.com/baidu-research/warp-ctc.git`
     cd warp-ctc
     mkdir build; cd build
