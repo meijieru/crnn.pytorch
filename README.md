@@ -6,7 +6,6 @@ Origin software could be found in [crnn](https://github.com/bgshih/crnn)
 
 fork from meijieru/crnn.pytorch https://github.com/meijieru/crnn.pytorch
 
-
 Envrionment 
 --------
 python 3.6
@@ -15,24 +14,6 @@ opencv2.4 + pytorch + lmdb +wrap_ctc
 
 ATTENTION!
 getLmdb.py must run in python2.x
-
-Run demo
---------
-A demo program can be found in ``src/demo.py``. Before running the demo, download a pretrained model
-from [Baidu Netdisk](https://pan.baidu.com/s/1pLbeCND) or [Dropbox](https://www.dropbox.com/s/dboqjk20qjkpta3/crnn.pth?dl=0). 
-This pretrained model is converted from auther offered one by ``tool``.
-Put the downloaded model file ``crnn.pth`` into directory ``data/``. Then launch the demo by:
-
-    python demo.py
-
-The demo reads an example image and recognizes its text content.
-
-Example image:
-![my_example_image](./data/demo.png)
-
-Expected output:
-    loading pretrained model from ./data/crnn.pth
-    a-----v--a-i-l-a-bb-l-ee-- => available
 
 Dependence
 ----------
@@ -57,7 +38,6 @@ Train a new model
 Construct dataset following origin guide. For training with variable length, please sort the image according to the text length. reference:https://github.com/Aurora11111/TextRecognitionDataGenerator
 
 1. 数据预处理
-
 运行`/contrib/crnn/tool/getLmdb.py`
 
     # 生成的lmdb输出路径
@@ -66,7 +46,6 @@ Construct dataset following origin guide. For training with variable length, ple
     imgdata = open("./train.txt")
 
 2. 训练模型
-
 运行`/contrib/crnn/crnn_main.py`
 
     python crnn_main.py [--param val]
@@ -99,5 +78,22 @@ Construct dataset following origin guide. For training with variable length, ple
 修改`/contrib/crnn/keys.py`中`alphabet = '012346789'`增加或者减少类别
 
 3. 注意事项
-
 训练和预测采用的类别数和LSTM隐藏层数需保持一致
+
+Run demo
+--------
+A demo program can be found in ``src/demo.py``. Before running the demo, download a pretrained model
+from [Baidu Netdisk](https://pan.baidu.com/s/1pLbeCND) or [Dropbox](https://www.dropbox.com/s/dboqjk20qjkpta3/crnn.pth?dl=0). 
+This pretrained model is converted from auther offered one by ``tool``.
+Put the downloaded model file ``crnn.pth`` into directory ``data/``. Then launch the demo by:
+
+    python demo.py
+
+The demo reads an example image and recognizes its text content.
+
+Example image:
+![my_example_image](./data/demo.png)
+
+Expected output:
+    loading pretrained model from ./data/crnn.pth
+    a-----v--a-i-l-a-bb-l-ee-- => available
