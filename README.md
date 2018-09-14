@@ -55,18 +55,16 @@ Construct dataset following origin guide. For training with variable length, ple
     --nh               LSTM隐藏层数, default=256
     --niter            训练回合数, default=25
     --lr               学习率, default=0.00005
-    --beta1             
     --cuda             使用GPU, action='store_true'
     --ngpu             使用GPU的个数, default=1
     --crnn             选择预训练模型
-    --alphabet         设置分类
-    --Diters            
+    --alphabet         设置分类  
     --experiment        模型保存目录
     --displayInterval   设置多少次迭代显示一次, default=1000
     --n_test_disp        每次验证显示的个数, default=10
     --valInterval        设置多少次迭代验证一次, default=1000
     --saveInterval       设置多少次迭代保存一次模型, default=1000
-    --adam               使用adma优化器, action='store_true'
+    --adam               使用adma优化器, default='True'
     --adadelta           使用adadelta优化器, action='store_true'
     --keep_ratio         设置图片保持横纵比缩放, action='store_true'
     --random_sample      是否使用随机采样器对数据集进行采样, action='store_true'
