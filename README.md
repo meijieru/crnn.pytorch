@@ -4,7 +4,6 @@ CRNN TRAIN PYTORCH
 This software implements the Convolutional Recurrent Neural Network (CRNN) in pytorch.
 Origin software could be found in [crnn](https://github.com/bgshih/crnn)
 
-fork from meijieru/crnn.pytorch https://github.com/meijieru/crnn.pytorch
 
 Envrionment 
 --------
@@ -16,7 +15,7 @@ ATTENTION!
 getLmdb.py must run in python2.x
 
 * [warp_ctc_pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorch_bindings/pytorch_binding)
-* lmdb
+
 
 error when install warp_ctc_pytorch
 ----------
@@ -50,12 +49,12 @@ Construct dataset following origin guide. For training with variable length, ple
     python crnn_main.py [--param val]
     --trainroot        训练集路径
     --valroot          验证集路径
-    --workers          CPU工作核数, default=2
+    --workers          CPU工作核数, default=4
     --batchSize        设置batchSize大小, default=64
     --imgH             图片高度, default=32
     --nh               LSTM隐藏层数, default=256
     --niter            训练回合数, default=25
-    --lr               学习率, default=0.01
+    --lr               学习率, default=0.00005
     --beta1             
     --cuda             使用GPU, action='store_true'
     --ngpu             使用GPU的个数, default=1
@@ -63,10 +62,10 @@ Construct dataset following origin guide. For training with variable length, ple
     --alphabet         设置分类
     --Diters            
     --experiment        模型保存目录
-    --displayInterval   设置多少次迭代显示一次, default=500
+    --displayInterval   设置多少次迭代显示一次, default=1000
     --n_test_disp        每次验证显示的个数, default=10
-    --valInterval        设置多少次迭代验证一次, default=500
-    --saveInterval       设置多少次迭代保存一次模型, default=500
+    --valInterval        设置多少次迭代验证一次, default=1000
+    --saveInterval       设置多少次迭代保存一次模型, default=1000
     --adam               使用adma优化器, action='store_true'
     --adadelta           使用adadelta优化器, action='store_true'
     --keep_ratio         设置图片保持横纵比缩放, action='store_true'
