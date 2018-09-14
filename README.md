@@ -13,14 +13,6 @@ python 3.6
 pytorch 4.0
 opencv2.4 + pytorch + lmdb +wrap_ctc
 
-安装lmdb `apt-get install lmdb`
-安装wrap_ctc
-    git clone https://github.com/baidu-research/warp-ctc.git`
-    cd warp-ctc
-    mkdir build; cd build
-    cmake ..
-    make
-
 ATTENTION!
 getLmdb.py must run in python2.x
 
