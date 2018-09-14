@@ -17,7 +17,7 @@ getLmdb.py must run in python2.x
 * [warp_ctc_pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorch_bindings/pytorch_binding)
 
 
-error when install warp_ctc_pytorch
+Issue when install warp_ctc_pytorch
 ----------
 * [ 11%] Building NVCC (Device) object CMakeFiles/warpctc.dir/src/warpctc_generated_reduce.cu.o
  sh: cicc: command not found
