@@ -46,6 +46,7 @@ Construct dataset following origin guide. For training with variable length, ple
 2. 训练模型
 
 运行`/contrib/crnn/crnn_main.py`
+
     python crnn_main.py [--param val]
     --trainroot        训练集路径
     --valroot          验证集路径
