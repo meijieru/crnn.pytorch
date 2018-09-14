@@ -1,4 +1,4 @@
-Convolutional Recurrent Neural Network
+CRNN TRAIN PYTORCH
 ======================================
 
 This software implements the Convolutional Recurrent Neural Network (CRNN) in pytorch.
