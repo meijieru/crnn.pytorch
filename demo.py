@@ -7,13 +7,14 @@ from PIL import Image
 import models.crnn as crnn
 
 
-model_path = './data/crnn.pth'
-img_path = './data/demo.png'
-alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
-
-model = crnn.CRNN(32, 1, 37, 256)
+model_path = './expr/netCRNN_24_6200.pth'
+img_path = './data/732.jpg'
+#alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
+alphabet = '0123456789'
+model = crnn.CRNN(32, 1, 11, 256)
 if torch.cuda.is_available():
     model = model.cuda()
+    model = torch.nn.DataParallel(model, device_ids=range(1))
 print('loading pretrained model from %s' % model_path)
 model.load_state_dict(torch.load(model_path))
 
