@@ -34,7 +34,7 @@ parser.add_argument('--lr', type=float, default=0.00005, help='learning rate for
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument('--cuda', default=True, help='enables cuda')
 parser.add_argument('--ngpu', type=int, default=1, help='number of GPUs to use')
-parser.add_argument('--crnn', default='', help="path to crnn (to continue training)")
+parser.add_argument('--crnn', default='/home/rice/PycharmProjects/crnn.pytorch-master/expr/netCRNN_4_26000.pth', help="path to crnn (use pretrained model to continue training)")
 parser.add_argument('--alphabet', type=str, default=alphabet)
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 parser.add_argument('--displayInterval', type=int, default=100, help='Interval to be displayed')
