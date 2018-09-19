@@ -10,11 +10,11 @@ Envrionment
 python 3.6
 pytorch 4.0
 opencv2.4 + pytorch + lmdb +wrap_ctc
+* [warp_ctc_pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorch_bindings/pytorch_binding)
 
 ATTENTION!
-getLmdb.py must run in python2.x
 
-* [warp_ctc_pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorch_bindings/pytorch_binding)
+getLmdb.py must run in python2.x
 
 
 Issue when install warp_ctc_pytorch
@@ -33,6 +33,7 @@ Issue when install warp_ctc_pytorch
 Train a new model
 -----------------
 Construct dataset following origin guide. For training with variable length, please sort the image according to the text length. reference:https://github.com/Aurora11111/TextRecognitionDataGenerator
+1000 times per char,10 char per image
 
 1. 数据预处理
 
