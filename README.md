@@ -55,6 +55,7 @@ Construct dataset following origin guide. For training with variable length, ple
     --workers          CPU工作核数, default=4
     --batchSize        设置batchSize大小, default=64
     --imgH             图片高度, default=32
+    --imgW             图片宽度,default =280(所用训练图片均为280*32)
     --nh               LSTM隐藏层数, default=256
     --niter            训练回合数, default=25
     --lr               学习率, default=0.00005
