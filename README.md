@@ -79,6 +79,13 @@ Construct dataset following origin guide. For training with variable length, ple
 3. 注意事项
 训练和预测采用的类别数和LSTM隐藏层数需保持一致
 
+
+Train a new model( new nclass is dfferent from old nclass)
+-----------------
+when you nclass is diferent from old ones, you can use this to finetune:
+python finetune.py
+
+
 Run demo
 --------
 A demo program can be found in ``src/demo.py``. Before running the demo, download a pretrained model
