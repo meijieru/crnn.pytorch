@@ -37,7 +37,7 @@ parser.add_argument('--lr', type=float, default=0.001, help='learning rate for C
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument('--cuda', default=True, help='enables cuda')
 parser.add_argument('--ngpu', type=int, default=1, help='number of GPUs to use')
-parser.add_argument('--crnn', default='', help="")
+parser.add_argument('--crnn', default='', help="")# load pretrained model to restart training
 parser.add_argument('--alphabet', type=str, default=alphabet)
 parser.add_argument('--experiment', default=None, help='Where to store samples and models')
 parser.add_argument('--displayInterval', type=int, default=1000, help='Interval to be displayed')
