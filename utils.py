@@ -10,8 +10,6 @@ import numpy as np
 import sys
 
 
-
-
 class strLabelConverter(object):
     """Convert between str and label.
     NOTE:
@@ -32,14 +30,6 @@ class strLabelConverter(object):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
             self.dict[char] = i + 1
 
-    def is_chinese(self, uchar):
-        """判断一个unicode是否是汉字"""
-        alnum = np.array([ch.isalnum() for ch in uchar])
-        if not alnum.all():
-            return True
-        else:
-            return False
-
     def encode(self, text):
         """Support batch or single str.
         Args:
@@ -50,17 +40,11 @@ class strLabelConverter(object):
         """
         length = []
         result = []
-        #print(text)
-        for item in text:
-            #print(item)
 
-            if self.is_chinese(item):
-                 #item = unicode(item, 'utf-8')
-                 item = str(item.encode('utf-8'))
-                #item = item
+        for item in text:
+            item = item.decode('utf-8', 'strict')
             length.append(len(item))
             for char in item:
-                #print(char)
                 index = self.dict[char]
                 result.append(index)
         text = result
