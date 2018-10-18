@@ -90,6 +90,13 @@ def weights_init(m):
 
 crnn = crnn.CRNN(opt.imgH, nc, nclass, opt.nh)
 crnn.apply(weights_init)
+
+if opt.cuda:
+    crnn.cuda()
+    crnn = torch.nn.DataParallel(crnn, device_ids=range(opt.ngpu))
+    image = image.cuda()
+    criterion = criterion.cuda()
+
 if opt.pretrained != '':
     print('loading pretrained model from %s' % opt.pretrained)
     crnn.load_state_dict(torch.load(opt.pretrained))
@@ -99,11 +106,7 @@ image = torch.FloatTensor(opt.batchSize, 3, opt.imgH, opt.imgH)
 text = torch.IntTensor(opt.batchSize * 5)
 length = torch.IntTensor(opt.batchSize)
 
-if opt.cuda:
-    crnn.cuda()
-    crnn = torch.nn.DataParallel(crnn, device_ids=range(opt.ngpu))
-    image = image.cuda()
-    criterion = criterion.cuda()
+
 
 image = Variable(image)
 text = Variable(text)
