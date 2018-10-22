@@ -29,6 +29,8 @@ Issue when install warp_ctc_pytorch
  make: *** [Makefile:130: all] Error 2               you should reinstall your cuda, and make sure it install completely
 * THCudaMallco error       https://github.com/baidu-research/warp-ctc/pull/71/files
 * https://github.com/Xtra-Computing/thundersvm/issues/54#issuecomment-416413155
+* ![my_error_image](./data/error.png)
+ ln -s /opt/cuda/include/* /home/rice/anaconda3/lib/python3.6/site-packages/torch/utils/ffi/../../lib/include/THC/
 
 Train a new model
 -----------------
