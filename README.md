@@ -36,8 +36,6 @@ Train a new model
 -----------------
 Construct dataset following origin guide. For training with variable length, please sort the image according to the text length. reference:https://github.com/Aurora11111/TextRecognitionDataGenerator
 
-1000 times per char,10 char per image
-
 1. 数据预处理
 
 运行`/contrib/crnn/tool/getLmdb.py`
