@@ -1,12 +1,16 @@
-import torch
-import utils
-from data_generator.config import Alphabet
-import models.crnn as crnn
-from torchvision import transforms
+# -*- coding: utf-8 -*-
+# @Time    : 2018/8/23 22:20
+# @Author  : zhoujun
+
 import os
-import matplotlib.pyplot as plt
 import cv2
+import torch
+from torchvision import transforms
+import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import utils
+import crnn as crnn
+from data_generator.config import Alphabet
 
 myfont = fm.FontProperties(fname='./data/msyh.ttc')
 
@@ -77,6 +81,21 @@ class Pytorch_model:
         sim_pred = self.converter.decode(preds.data, preds_size.data, raw=False)
         print('%-20s => %-20s' % (raw_pred, sim_pred))
         return sim_pred
+
+
+def decode(preds, alphabet, raw=False):
+    results = []
+    for word in preds:
+        if raw:
+            results.append(''.join([alphabet[int(i)] for i in word]))
+        else:
+            result = []
+            l = len(word)
+            for i in range(l):
+                if word[i] != 0 and (not (i > 0 and word[i] == word[i - 1])):  # Hack to decode label as well
+                    result.append(alphabet[int(word[i])])
+            results.append(''.join(result))
+    return results
 
 
 if __name__ == '__main__':

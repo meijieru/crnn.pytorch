@@ -27,3 +27,4 @@ class Alphabet:
     LETTERS__LOWERCASE_DIGITS_SYMBOLS= BLANK_SYMBOL + Digits + LettersLowercase + Symbols
     # CHINESECHAR_LETTERS_DIGIT_SYMBOLS = Digits + LettersCapitals + LettersLowercase + Symbols + ChineseChar
     CHINESECHAR_LETTERS_DIGIT_SYMBOLS = BLANK_SYMBOL +Digits + LettersCapitals + LettersLowercase + Symbols + ChineseChar
+    alphabet = u'0123456789.-\/:;D,wsCc()zo+v'

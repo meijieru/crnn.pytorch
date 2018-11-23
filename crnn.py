@@ -92,3 +92,10 @@ class CRNN(nn.Module):
         output = self.rnn(conv)
 
         return output
+
+if __name__ == '__main__':
+    import torch
+    input = torch.zeros(64,3,32,320)
+    net = CRNN(32,3,2,256)
+    y = net(input)
+    print(y.shape)

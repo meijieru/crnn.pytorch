@@ -7,4 +7,4 @@
 *.pkl
 __pycache__/
 .idea/
-log/
+output/
