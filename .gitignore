@@ -9,3 +9,6 @@
 
 .idea/
 .vscode/
+data/lmdb/
+data/train/
+data/val/

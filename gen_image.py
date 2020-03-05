@@ -27,7 +27,8 @@ def get_args():
     parser.add_argument('--cnum1', type=int, default=7)
     parser.add_argument('--cnum2', type=int, default=7)
     parser.add_argument('--char_set', default='0123456789')
-    parser.add_argument('--font_path', default="/Library/Fonts/华文仿宋.ttf")
+    # parser.add_argument('--font_path', default="/Library/Fonts/华文仿宋.ttf")
+    parser.add_argument('--font_path', default="C:\\Windows\\Fonts\\STFANGSO.TTF")
     return parser.parse_args()
 
 def main(args):
@@ -35,7 +36,7 @@ def main(args):
     font = ImageFont.truetype(args.font_path, size=28)
     if not os.path.exists(args.output):
         os.mkdir(args.output)
-    for ind in xrange(args.make_num):
+    for ind in range(args.make_num):
         content = gen_rand(args.char_set, args.cnum1, args.cnum2)
         img = Image.new('L', (args.img_w, args.img_h), (255))
         # img = Image.new('RGB', (args.img_w, args.img_h), (0, 0, 0))
@@ -43,8 +44,9 @@ def main(args):
         draw.text((2, 2), content, font=font)
         img = PIL.ImageOps.invert(img)
         savepath = os.path.join(args.output, '{:08d}'.format(ind)+'_'+content+'.jpg')
-        print savepath, content
+        print(savepath, content)
         img.save(savepath)
+
 
 if __name__ == '__main__':
     main(get_args())

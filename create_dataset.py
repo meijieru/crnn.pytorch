@@ -2,6 +2,7 @@ import os
 import lmdb # install lmdb by "pip install lmdb"
 import cv2
 import numpy as np
+import traceback
 
 
 def checkImageIsValid(imageBin):
@@ -17,8 +18,17 @@ def checkImageIsValid(imageBin):
 
 def writeCache(env, cache):
     with env.begin(write=True) as txn:
+        # python2
+        '''
         for k, v in cache.iteritems():
             txn.put(k, v)
+        '''
+        # python3
+        for k, v in cache.items():  # python3
+            print(type(k), type(v))
+            if type(v) is str:
+                v = v.encode()
+            txn.put(k.encode(), v)
 
 
 def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkValid=True):
@@ -34,16 +44,18 @@ def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkV
     """
     assert(len(imagePathList) == len(labelList))
     nSamples = len(imagePathList)
-    env = lmdb.open(outputPath, map_size=1099511627776)
+    # env = lmdb.open(outputPath, map_size=1099511627776)
+    # 改小map_size即可
+    env = lmdb.open(outputPath, map_size=1099511627)
     cache = {}
     cnt = 1
-    for i in xrange(nSamples):
+    for i in range(nSamples):
         imagePath = imagePathList[i]
         label = labelList[i]
         if not os.path.exists(imagePath):
             print('%s does not exist' % imagePath)
             continue
-        with open(imagePath, 'r') as f:
+        with open(imagePath, 'rb') as f:
             imageBin = f.read()
         if checkValid:
             if not checkImageIsValid(imageBin):

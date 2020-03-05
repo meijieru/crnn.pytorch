@@ -13,6 +13,7 @@ def get_args():
     parser.add_argument('--suffix', default='*.jpg')
     return parser.parse_args()
 
+
 def main(args):
     '''main'''
     if not os.path.exists(args.lmdb_path):
@@ -26,8 +27,9 @@ def main(args):
             continue
         imgpathlist.append(filename)
         labellist.append(linepart[-1])
-        print filename, linepart[-1]
+        print(filename, linepart[-1])
     createDataset(args.lmdb_path, imgpathlist, labellist)
+
 
 if __name__ == '__main__':
     main(get_args())

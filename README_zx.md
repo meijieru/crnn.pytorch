@@ -32,7 +32,7 @@ Train a new model
 
 1. Construct dataset following origin guide. For training with variable length, please sort the image according to the text length.
 ```
-python gen_image.py --output data/train --make_num 10000
+python gen_image.py --output data/train --make_num 5000
 python gen_image.py --output data/val --make_num 1000
 
 python create_dataset_main.py --lmdb_path data/lmdb/train --data_path data/train
@@ -52,8 +52,45 @@ python crnn_main.py \
     --adadelta \
     --lr=0.01 \
     --random_sample
+
+python crnn_main.py  --alphabet 0123456789 --trainRoot data/lmdb/train --valRoot data/lmdb/val --workers=1 --batchSize=16  --displayInterval=100  --valInterval=100 --adadelta --lr=0.01 --random_sample
+
+--alphabet
+0123456789
+--trainRoot
+data/lmdb/train
+--valRoot
+data/lmdb/val
+--workers
+1
+--batchSize
+16
+--displayInterval
+100
+--valInterval
+100
+--adadelta
+--lr
+0.01
+--random_sample
+--cuda
 ```
 
 1. Construct dataset following [origin guide](https://github.com/bgshih/crnn#train-a-new-model). If you want to train with variable length images (keep the origin ratio for example), please modify the `tool/create_dataset.py` and sort the image according to the text length.
 2. Execute ``python train.py --adadelta --trainRoot {train_path} --valRoot {val_path} --cuda``. Explore ``train.py`` for details.
 
+
+[Pytorch Bindings for warp-ctc Built with VS2017](https://github.com/hzli-ucas/warp-ctc)
+```bash
+git clone -b vs2017 https://github.com/hzli-ucas/warp-ctc.git
+cd warp-ctc
+mkdir build
+cd build
+# cmake -G "Visual Studio 15 2017 Win64" ..
+cmake -G "Visual Studio 16 2019" ..
+
+# 
+
+cd ../pytorch_binding
+python setup.py install
+```
