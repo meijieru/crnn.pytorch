@@ -29,5 +29,31 @@ Dependence
 
 Train a new model
 -----------------
+
+1. Construct dataset following origin guide. For training with variable length, please sort the image according to the text length.
+```
+python gen_image.py --output data/train --make_num 10000
+python gen_image.py --output data/val --make_num 1000
+
+python create_dataset_main.py --lmdb_path data/lmdb/train --data_path data/train
+python create_dataset_main.py --lmdb_path data/lmdb/val --data_path data/val
+```
+2. ``python crnn_main.py [--param val]``. Explore ``crnn_main.py`` for details.
+
+```
+python crnn_main.py \
+    --alphabet='0123456789' \
+    --trainroot='data/lmdb/train' \
+    --valroot='data/lmdb/val' \
+    --workers=1 \
+    --batchSize=16 \
+    --displayInterval=100 \
+    --valInterval=100 \
+    --adadelta \
+    --lr=0.01 \
+    --random_sample
+```
+
 1. Construct dataset following [origin guide](https://github.com/bgshih/crnn#train-a-new-model). If you want to train with variable length images (keep the origin ratio for example), please modify the `tool/create_dataset.py` and sort the image according to the text length.
 2. Execute ``python train.py --adadelta --trainRoot {train_path} --valRoot {val_path} --cuda``. Explore ``train.py`` for details.
+
