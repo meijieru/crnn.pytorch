@@ -16,8 +16,10 @@ import numpy as np
 class lmdbDataset(Dataset):
 
     def __init__(self, root=None, transform=None, target_transform=None):
+        print(root)
         self.env = lmdb.open(
             root,
+            # map_size=1099511627,
             max_readers=1,
             readonly=True,
             lock=False,
@@ -29,7 +31,8 @@ class lmdbDataset(Dataset):
             sys.exit(0)
 
         with self.env.begin(write=False) as txn:
-            nSamples = int(txn.get('num-samples'))
+            # nSamples = int(txn.get('num-samples'))
+            nSamples = int(txn.get('num-samples'.encode()))
             self.nSamples = nSamples
 
         self.transform = transform

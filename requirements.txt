@@ -1,0 +1,5 @@
+pytorch==0.4.1
+torchvision==0.2.1
+PILLOW==6.2.1
+lmdb==0.98
+
