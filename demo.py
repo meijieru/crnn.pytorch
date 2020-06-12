@@ -19,7 +19,7 @@ model.load_state_dict(torch.load(model_path))
 
 converter = utils.strLabelConverter(alphabet)
 
-transformer = dataset.resizeNormalize((100, 32))
+transformer = dataset.resizeNormalize((128, 32))
 image = Image.open(img_path).convert('L')
 image = transformer(image)
 if torch.cuda.is_available():
