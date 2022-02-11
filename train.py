@@ -59,7 +59,7 @@ if torch.cuda.is_available() and not opt.cuda:
 
 train_dataset = dataset.lmdbDataset(root=opt.trainroot)
 assert train_dataset
-if not opt.random_sample:
+if opt.random_sample:
     sampler = dataset.randomSequentialSampler(train_dataset, opt.batchSize)
 else:
     sampler = None
