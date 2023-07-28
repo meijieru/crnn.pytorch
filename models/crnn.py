@@ -45,7 +45,7 @@ class CRNN(nn.Module):
                                nn.LeakyReLU(0.2, inplace=True))
             else:
                 cnn.add_module('relu{0}'.format(i), nn.ReLU(True))
-
+					                          #if input: nc x 32 x 128
         convRelu(0)
         cnn.add_module('pooling{0}'.format(0), nn.MaxPool2d(2, 2))  # 64x16x64
         convRelu(1)
@@ -53,12 +53,12 @@ class CRNN(nn.Module):
         convRelu(2, True)
         convRelu(3)
         cnn.add_module('pooling{0}'.format(2),
-                       nn.MaxPool2d((2, 2), (2, 1), (0, 1)))  # 256x4x16
+                       nn.MaxPool2d((2, 2), (2, 1), (0, 1)))  # 256x4x17
         convRelu(4, True)
         convRelu(5)
         cnn.add_module('pooling{0}'.format(3),
-                       nn.MaxPool2d((2, 2), (2, 1), (0, 1)))  # 512x2x16
-        convRelu(6, True)  # 512x1x16
+                       nn.MaxPool2d((2, 2), (2, 1), (0, 1)))  # 512x2x18
+        convRelu(6, True)  # 512x1x17
 
         self.cnn = cnn
         self.rnn = nn.Sequential(
