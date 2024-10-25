@@ -1,5 +1,5 @@
 lmdb==0.97
-numpy==1.17.2
+numpy==1.22.0
 Pillow==9.0.0
 six==1.12.0
 torch==1.2.0
